@@ -47,6 +47,7 @@ public class App
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
+                    System.out.println("tick tock");
                     elevatorService.iterate();
                 }
             },1,1000);

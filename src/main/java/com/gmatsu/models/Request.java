@@ -1,24 +1,21 @@
 package com.gmatsu.models;
 
 /**
- * @author gmatsu
+ * @author: gmatsu
  */
-public class Passenger {
-
-    private int id;
+public class Request {
 
     private int fromFloor;
     private int toFloor;
 
-    private Elevator myElevator;
+    private Passenger passenger;
 
-
-    public Elevator getMyElevator() {
-        return myElevator;
+    public Passenger getPassenger() {
+        return passenger;
     }
 
-    public void setMyElevator(Elevator myElevator) {
-        this.myElevator = myElevator;
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
     }
 
     public int getToFloor() {

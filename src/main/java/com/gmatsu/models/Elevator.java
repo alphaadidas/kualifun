@@ -14,14 +14,15 @@ public class Elevator {
     private int maxFloor = 1;
 
     private Direction direction;
-
+    private DoorState doorState;
     private int currentFloor;
     private int[] targetFloors;
     private boolean evaluating = false;
 
-    //STATE :  OutOfOrder, Moving, Open, Closed
+    private int tripCount = 0;
 
-    //SERVICE_STATE :  InOrder / OutOfOrder
+    private Maintenance maintenance = Maintenance.INACTIVE;
+
     //trip Count ,, init or reset after service
     //
 
@@ -34,16 +35,9 @@ public class Elevator {
     private int maxLoad = 10;
     private List<Passenger> passengers = new ArrayList<Passenger>();
 
-    
-    public void disembardPassenger(Passenger p){
-        System.out.println("Passenger leaving elevator");
-    }
-
-    public void loadPassenger(Passenger p){
-        System.out.println("Passenger entering elevator, from: to: ");
-    }
 
     
+
 
     public int getMaxLoad() {
         return maxLoad;
@@ -99,5 +93,13 @@ public class Elevator {
 
     public void setEvaluating(boolean evaluating) {
         this.evaluating = evaluating;
+    }
+
+    public int getTripCount() {
+        return tripCount;
+    }
+
+    public void setTripCount(int tripCount) {
+        this.tripCount = tripCount;
     }
 }

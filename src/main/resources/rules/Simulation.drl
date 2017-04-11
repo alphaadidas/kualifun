@@ -1,0 +1,135 @@
+
+
+import com.gmatsu.models.Elevator
+import com.gmatsu.models.Clock
+import com.gmatsu.models.Direction
+import com.gmatsu.models.Passenger
+import com.gmatsu.models.*
+
+declare PassengerEvent
+   @role(event)
+   @expires(1s)
+end
+
+declare Clock
+   @role(event)
+   @expires(1s)
+end
+
+
+dialect "mvel"
+
+
+rule "Passenger Request Entered"
+no-loop true
+when
+    $request: Request() from entry-point "RequestStream"
+then
+   // hail elevators?
+end
+
+
+// Passenger Request to Enter System
+
+
+// Passenger Floor is reached
+rule "Passenger Floor is reached"
+when
+
+then
+ end
+
+// Passenger Exits System
+
+
+
+
+
+// ------ Elevator Rules
+
+// Fetch List of Active Elevtors in system
+query "FetchElevators"()
+    $elevator : Elevator()
+end
+
+
+//Kick the Elevetors to do something , Transition it to a new floor.
+rule "Increment Elevator Location"
+no-loop true
+when
+	$c : Clock() from entry-point "IntervalStepStream"
+	$elevator : Elevator ()
+then
+
+	int floorDiff = 0;
+    if($elevator.getDirection() == Direction.UP)  floorDiff = 1;
+    else if ($elevator.getDirection() == Direction.DOWN) floorDiff = -1;
+
+    //update the elevators floor
+	modify($elevator) {
+	    currentFloor = $elevator.getCurrentFloor() + floorDiff,
+		evaluating= false
+	}
+
+	retract($c)
+	
+end
+
+//  Init -> CLose state
+
+//  Close -> Open State
+
+// Open -> close State
+
+// Moving ?
+
+// stopped ?
+
+rule "A Requested Floor Reached, so open the door"
+when
+    //Not processing elevator, and door isn't open, and its active, and passenger wants off this floor
+    $elevator : Elevator(evaluating == false , doorState != DoorState.OPEN, maintenance = Maintenance.INACTIVE)
+    exists Passenger(myElevator == $elevator, toFloor == $elevator.currentFloor)
+then
+    System.out.println("Exit floor reached, open door ");
+    // open the door
+    modify($elevator) {
+        doorState = DoorState.OPEN,
+        evaluating = true,
+        tripCount = tripCount+1
+    }
+    
+ end
+
+ // Door is open, and passengers are waiting, and going in the same direction as the elevator
+ // Door is open, and passnagers are waiting, elevator has not direction
+
+
+
+rule "Close The Door When Finished Processing"
+when
+    $elevator : Elevator (evaluating== false, doorState == DoorState.OPEN)
+	not Passenger ($elevator == $elevator, toFloor == $elevator.currentFloor)
+then
+    //no one in this elevator wants off, and the door is open.. close it dammit
+    modify($elevator){
+        doorState = DoorState.CLOSE,
+        evaluating = true
+    }
+    
+end
+
+// Elevator on same floor as request
+// Elevator heading down,  has a request
+// Elevator heading up,  has a request
+
+
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,8 @@
 package com.gmatsu.models;
 
 /**
- *
  * @author: gmatsu
  */
-public enum Direction {
-    UP, DOWN, NONE
+public enum Maintenance {
+    ACTIVE, INACTIVE
 }
