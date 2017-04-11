@@ -6,7 +6,7 @@ import com.gmatsu.models.Direction
 import com.gmatsu.models.Passenger
 import com.gmatsu.models.*
 
-declare PassengerEvent
+declare RequestEvent
    @role(event)
    @expires(1s)
 end
@@ -23,13 +23,14 @@ dialect "mvel"
 rule "Passenger Request Entered"
 no-loop true
 when
-    $request: Request() from entry-point "RequestStream"
+    $request: RequestEvent() from entry-point "RequestStream"
 then
    // hail elevators?
 end
 
 
-// Passenger Request to Enter System
+//Passenger Enters Elevator
+
 
 
 // Passenger Floor is reached
