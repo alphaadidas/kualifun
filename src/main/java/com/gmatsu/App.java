@@ -1,5 +1,8 @@
 package com.gmatsu;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Taking the Drools Rule Engine Approach to Simulating Elevators.
  *
@@ -17,16 +20,17 @@ public class App
 
         System.out.println( "Hello World!" );
 
-        ElevatorService elevatorService = new ElevatorService();
+        final ElevatorService elevatorService = new ElevatorService();
 
         int numOfFloors = 10;
-        elevatorService.initFloors(10);
-        elevatorService.initElevators(5);
+        int numOfElevetors = 5;
+
+        elevatorService.initFloors(numOfFloors);
+        elevatorService.initElevators(numOfElevetors);
         elevatorService.addElevator(20);  //add a Larger elevator
 
 
-        elevatorService.run(); //start engine
-
+        elevatorService.start(); //start engine
 
 
         //Add random requests
@@ -36,16 +40,19 @@ public class App
         elevatorService.elevatorRequest(3,5);
         elevatorService.elevatorRequest(5,2);
 
-        //elevatorService  add Passenger Request(1,2)
-        //elevatorService  add Passenger Request
-        //elevatorService  add Passenger Request
 
-        
+
+        //hack to create a 'simulation'
         try {
-        
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    elevatorService.iterate();
+                }
+            },1,1000);
+            
             Thread.currentThread().join();
-
-
+            
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

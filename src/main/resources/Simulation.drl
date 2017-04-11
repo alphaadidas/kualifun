@@ -1,0 +1,75 @@
+
+
+import com.gmatsu.models.Elevator
+import com.gmatsu.models.Clock
+import com.gmatsu.models.Direction
+
+declare PassengerEvent
+   @role(event)
+   @expires(1s)
+end
+
+declare Clock
+   @role(event)
+   @expires(1s)
+end
+
+
+dialect "mvel"
+
+
+
+
+# Passenger Request to Enter System
+
+
+# Passenger Floor is reached
+
+
+# Passenger Exits System
+
+
+
+
+
+# ------ Elevator Rules
+
+#Kick the Elevetors to do something , Transition it to a new floor.
+rule "Increment Actions for Elevator" no-loop true when
+	$c : Clock() from entry-point "IntervalStepStream"
+	$elevator : Elevator ()
+then
+
+	int floorDiff = 0;
+    if($elevator.getDirection() == Direction.UP)  floorDiff = 1;
+    else if ($elevator.getDirection() == Direction.DOWN) floorDiff = -1;
+
+    #update the elevators floor
+	modify($elevator) {
+	    currentFloor = $elevator.getCurrentFloor() + floorDiff,
+		evaluating= false
+	}
+
+	retract($c)
+	
+end
+
+#  Init -> CLose state
+
+#  Close -> Open State
+
+# Open -> close State
+
+# Moving ?
+
+# stopped ?
+
+
+
+
+
+# Fetch List of Active Elevtors in system
+
+
+
+
