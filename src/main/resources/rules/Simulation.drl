@@ -85,10 +85,10 @@ end
 
 // stopped ?
 
-rule "A Requested Floor Reached, so open the door"
+rule "Passenger wants off, so open the door"
 when
     //Not processing elevator, and door isn't open, and its active, and passenger wants off this floor
-    $elevator : Elevator(evaluating == false , doorState != DoorState.OPEN, maintenance = Maintenance.INACTIVE)
+    $elevator : Elevator(evaluating == false , doorState != DoorState.OPEN)
     exists Passenger(myElevator == $elevator, toFloor == $elevator.currentFloor)
 then
     System.out.println("Exit floor reached, open door ");
@@ -99,7 +99,7 @@ then
         tripCount = tripCount+1
     }
     
- end
+end
 
  // Door is open, and passengers are waiting, and going in the same direction as the elevator
  // Door is open, and passnagers are waiting, elevator has not direction
@@ -108,7 +108,7 @@ then
 
 rule "Close The Door When Finished Processing"
 when
-    $elevator : Elevator (evaluating== false, doorState == DoorState.OPEN)
+    $elevator : Elevator (evaluating == false, doorState == DoorState.OPEN)
 	not Passenger ($elevator == $elevator, toFloor == $elevator.currentFloor)
 then
     //no one in this elevator wants off, and the door is open.. close it dammit
@@ -125,7 +125,15 @@ end
 
 
 
-
+rule "Put an Empty Elevator needing Maintenance out of Order"
+when
+    $elevator: Elevator(passengers.size ==0 , tripCount >100)
+then
+    modify($elevator){
+        maintenance = Maintenance.INACTIVE,
+        tripCount = 0
+    }
+end
 
 
 

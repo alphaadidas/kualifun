@@ -90,7 +90,6 @@ public class ElevatorService {
             System.out.println("Found Elevator:"+elevator.getId() + " on floor:"+elevator.getCurrentFloor());
         }
         
-
     }
 
 
