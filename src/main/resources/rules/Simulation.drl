@@ -6,7 +6,7 @@ import com.gmatsu.models.Direction
 import com.gmatsu.models.Passenger
 import com.gmatsu.models.*
 
-declare RequestEvent
+declare Request
    @role(event)
    @expires(1s)
 end
@@ -23,9 +23,20 @@ dialect "mvel"
 rule "Passenger Request Entered"
 no-loop true
 when
-    $request: RequestEvent() from entry-point "RequestStream"
+    $request: Request() from entry-point "RequestStream"
 then
    // hail elevators?
+   System.out.println("request recieved");
+   Passenger p = new Passenger();
+   p.setToFloor($request.getToFloor());
+   p.setFromFloor($request.getFromFloor());
+   p.setMyElevator(null);
+   insert(p);
+
+end
+
+query "FetchPassengers"()
+    $p : Passenger()
 end
 
 
@@ -56,15 +67,18 @@ end
 
 //Kick the Elevetors to do something , Transition it to a new floor.
 rule "Increment Elevator Location"
-no-loop true
+//no-loop true
 when
 	$c : Clock() from entry-point "IntervalStepStream"
 	$elevator : Elevator ()
 then
+//    System.out.println("Elevetor moving :"+ $elevator.getCurrentFloor() + " : "+$c);
 
 	int floorDiff = 0;
     if($elevator.getDirection() == Direction.UP)  floorDiff = 1;
     else if ($elevator.getDirection() == Direction.DOWN) floorDiff = -1;
+
+    if($elevator.getCurrentFloor() + floorDiff >= $elevator.getMaxFloor()) floorDiff = 0;
 
     //update the elevators floor
 	modify($elevator) {
@@ -86,18 +100,44 @@ end
 
 // stopped ?
 
+
+rule "Waiting elevetor is hailed"
+when
+    $p : Passenger(myElevator == null)
+    $e: Elevator(direction == Direction.NONE)
+    eval( Math.abs( $p.fromFloor - $e.currentFloor) < 4 )
+then
+    //Found a close by Elevator
+     System.out.println("Found an elevator");
+     //hail it
+     	int floorDiff = 0;
+     if($p.getFromFloor() - $e.getCurrentFloor() < 0)  floorDiff = -1;   //request below
+     else if ($p.getFromFloor() - $e.getCurrentFloor() > 0) floorDiff = 1; //request above
+
+     Direction dir = (floorDiff == 1)? Direction.UP: Direction.DOWN;
+
+     //set in motion
+     modify($e){
+        direction = dir
+
+     }
+
+
+ end
+
+
 rule "Passenger wants off, so open the door"
 when
     //Not processing elevator, and door isn't open, and its active, and passenger wants off this floor
     $elevator : Elevator(evaluating == false , doorState != DoorState.OPEN)
     exists Passenger(myElevator == $elevator, toFloor == $elevator.currentFloor)
 then
-    System.out.println("Exit floor reached, open door ");
+
     // open the door
     modify($elevator) {
         doorState = DoorState.OPEN,
         evaluating = true,
-        tripCount = tripCount+1
+        tripCount = 1  //need to increment
     }
     
 end

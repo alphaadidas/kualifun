@@ -36,4 +36,18 @@ public class Passenger {
     public void setFromFloor(int fromFloor) {
         this.fromFloor = fromFloor;
     }
+
+    @Override
+    public String toString() {
+        return "Passenger{" +
+                "id=" + id +
+                ", fromFloor=" + fromFloor +
+                ", toFloor=" + toFloor +
+                ", myElevator=" + myElevator +
+                '}';
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

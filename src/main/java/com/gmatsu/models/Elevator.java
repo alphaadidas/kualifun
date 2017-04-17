@@ -12,7 +12,7 @@ public class Elevator {
 
     private int minFloor = 1; // just keep this at 1, not supporitng skyscrapers
     private int maxFloor = 1;
-
+    
     private Direction direction;
     private DoorState doorState;
     private int currentFloor;
@@ -101,5 +101,22 @@ public class Elevator {
 
     public void setTripCount(int tripCount) {
         this.tripCount = tripCount;
+    }
+
+    public DoorState getDoorState() {
+        return doorState;
+    }
+
+    public void setDoorState(DoorState doorState) {
+        this.doorState = doorState;
+    }
+
+
+    public Maintenance getMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenance(Maintenance maintenance) {
+        this.maintenance = maintenance;
     }
 }

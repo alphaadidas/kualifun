@@ -1,5 +1,6 @@
 package com.gmatsu;
 
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,21 +42,55 @@ public class App
         elevatorService.elevatorRequest(5,2);
 
 
-
+        Timer timer = new Timer();
         //hack to create a 'simulation'
         try {
-            new Timer().scheduleAtFixedRate(new TimerTask() {
+            timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    System.out.println("tick tock");
+                    //System.out.println("tick tock");
                     elevatorService.iterate();
                 }
             },1,1000);
+
+
             
-            Thread.currentThread().join();
+            String input = "";
+            Scanner reader = new Scanner(System.in);  // Reading from System.in
+            System.out.println("Enter a number: ");
+            while (reader.hasNext()) {
+
+                input = reader.next();
+                if("exit".equals(input)) return;
+
+                switch(input){
+                    
+                    case "where":
+                        System.out.println("where");
+                        elevatorService.whereAreTheElevators();
+                        break;
+                    case "who":
+                        elevatorService.whoAreThePassengers();
+                        break;
+                    default :
+                        System.out.println("int");
+                        String[] req = input.split(",");
+                        int from = Integer.parseInt(req[0]);
+                        int to = Integer.parseInt(req[1]);
+                        elevatorService.elevatorRequest(from,to);
+
+                }
+
+                System.out.println("next....");
+
+            }
+
+
             
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            timer.cancel();
         }
 
     }

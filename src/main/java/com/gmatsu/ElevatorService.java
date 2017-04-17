@@ -1,7 +1,6 @@
 package com.gmatsu;
 
-import com.gmatsu.models.Clock;
-import com.gmatsu.models.Elevator;
+import com.gmatsu.models.*;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -36,7 +35,9 @@ public class ElevatorService {
             elevator.setId(i);
             //elevator.setMinFloor(1); defaulting to 1 already
             elevator.setMaxFloor(numOfFloors);
+            elevator.setCurrentFloor(1);
             //elevator.setMaxLoad(10); defaulting to 10
+            elevator.setDirection(Direction.NONE);
             this.ksession.insert(elevator);
             
         }
@@ -87,17 +88,46 @@ public class ElevatorService {
         }
 
         for (Elevator elevator: elevators){
-            System.out.println("Found Elevator:"+elevator.getId() + " on floor:"+elevator.getCurrentFloor());
+            //System.out.println("Found Elevator:"+elevator.getId() + " on floor:"+elevator.getCurrentFloor());
         }
         
     }
+    public void whereAreTheElevators(){
+        List<Elevator> elevators = new ArrayList<Elevator>();
+        QueryResults queryResults = this.ksession.getQueryResults("FetchElevators");
+        for (QueryResultsRow row : queryResults) {
+            elevators.add((Elevator) row.get("$elevator"));
+        }
 
+        for (Elevator elevator: elevators){
+            System.out.println("Found Elevator:"+elevator.getId() + " on floor:"+elevator.getCurrentFloor());
+        }
+    }
 
+    public void whoAreThePassengers(){
+        List<Passenger> passengers = new ArrayList<>();
+
+        QueryResults queryResults = this.ksession.getQueryResults("FetchPassengers");
+        for (QueryResultsRow row : queryResults) {
+            passengers.add((Passenger) row.get("$p"));
+        }
+
+        for (Passenger p : passengers){
+            System.out.println(p);
+        }
+    }
 
 
     public void elevatorRequest(int fromFloor, int toFloor){
         //insert Request into Drools EntryPoint
-        
+        Request req = new Request();
+        req.setToFloor(toFloor);
+        req.setFromFloor(fromFloor);
+
+        EntryPoint ep = this.ksession.getEntryPoint("RequestStream");
+        ep.insert(req);
+
+        this.ksession.fireAllRules();
     }
 
 }
